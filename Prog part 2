@@ -1,0 +1,137 @@
+using System;
+using System.Collections.Generic;
+
+namespace RecipeApp
+{
+    // Class to represent an ingredient
+    class Ingredient
+    {
+        public string Name { get; set; }
+        public double Quantity { get; set; }
+        public string Unit { get; set; }
+        public double Calories { get; set; }
+        public string FoodGroup { get; set; }
+    }
+
+    // Class to represent a step in the recipe
+    class Step
+    {
+        public string Description { get; set; }
+    }
+
+    // Delegate to notify the user if a recipe exceeds 300 calories
+    delegate void RecipeCaloriesExceededHandler(string recipeName);
+
+    class Program
+    {
+        static List<Recipe> recipes = new List<Recipe>();
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Welcome to the Recipe App!");
+
+            string input;
+            do
+            {
+                Console.WriteLine("Select an option:");
+                Console.WriteLine("1. Add a new recipe");
+                Console.WriteLine("2. View all recipes");
+                Console.WriteLine("3. Exit");
+                input = Console.ReadLine();
+
+                switch (input)
+                {
+                    case "1":
+                        AddRecipe();
+                        break;
+                    case "2":
+                        ViewAllRecipes();
+                        break;
+                }
+
+            } while (input != "3");
+        }
+
+        static void AddRecipe()
+        {
+            Recipe recipe = new Recipe();
+            Console.Write("Enter recipe name: ");
+            recipe.Name = Console.ReadLine();
+
+            Console.Write("Enter the number of ingredients: ");
+            int numIngredients = int.Parse(Console.ReadLine());
+
+            for (int i = 0; i < numIngredients; i++)
+            {
+                Ingredient ingredient = new Ingredient();
+                Console.Write("Enter ingredient name: ");
+                ingredient.Name = Console.ReadLine();
+                Console.Write("Enter quantity: ");
+                ingredient.Quantity = double.Parse(Console.ReadLine());
+                Console.Write("Enter unit of measurement: ");
+                ingredient.Unit = Console.ReadLine();
+                Console.Write("Enter number of calories: ");
+                ingredient.Calories = double.Parse(Console.ReadLine());
+                Console.Write("Enter food group: ");
+                ingredient.FoodGroup = Console.ReadLine();
+
+                recipe.Ingredients.Add(ingredient);
+            }
+
+            recipes.Add(recipe);
+        }
+
+        static void ViewAllRecipes()
+        {
+            if (recipes.Count == 0)
+            {
+                Console.WriteLine("No recipes to display.");
+                return;
+            }
+
+            recipes.Sort((x, y) => string.Compare(x.Name, y.Name));
+
+            Console.WriteLine("Recipes:");
+            for (int i = 0; i < recipes.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {recipes[i].Name}");
+            }
+
+            Console.Write("Enter the number of the recipe to view: ");
+            int selection = int.Parse(Console.ReadLine()) - 1;
+
+            DisplayRecipe(recipes[selection]);
+        }
+
+        static void DisplayRecipe(Recipe recipe)
+        {
+            double totalCalories = 0;
+
+            Console.WriteLine($"Recipe: {recipe.Name}");
+            foreach (var ingredient in recipe.Ingredients)
+            {
+                Console.WriteLine($"{ingredient.Quantity} {ingredient.Unit} of {ingredient.Name} - {ingredient.Calories} calories");
+                totalCalories += ingredient.Calories;
+            }
+
+            Console.WriteLine($"Total Calories: {totalCalories}");
+
+            if (totalCalories > 300)
+            {
+                Console.WriteLine("Warning: Total calories exceed 300!");
+            }
+        }
+    }
+
+    // Class to represent a recipe
+    class Recipe
+    {
+        public string Name { get; set; }
+        public List<Ingredient> Ingredients { get; set; }
+
+        public Recipe()
+        {
+            Ingredients = new List<Ingredient>();
+        }
+    }
+}
